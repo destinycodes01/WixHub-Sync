@@ -51,7 +51,7 @@ export default function App() {
           <p className="text-gray-500 mb-8">Connect your Wix site with HubSpot seamlessly.</p>
           <button
             onClick={handleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium transition-all duration-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-400 active:scale-[0.98] active:bg-gray-100"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
             Sign in with Google
