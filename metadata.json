@@ -1,0 +1,5 @@
+{
+  "name": "WixHub Sync",
+  "description": "A self-hosted Wix to HubSpot integration app for bi-directional contact syncing and form submissions.",
+  "requestFramePermissions": []
+}

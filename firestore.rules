@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - displayName: string
+    //   - email: string
+    //   - createdAt: timestamp
+    //
+    // Collection: hubspot_connections
+    // Document ID: {userId}
+    // Fields:
+    //   - userId: string
+    //   - hubDomain: string
+    //   - connectedAt: string
+    //   - mockToken: string
+    //
+    // Collection: users/{userId}/mappings
+    // Document ID: {mappingId}
+    // Fields:
+    //   - id: string
+    //   - wixField: string
+    //   - hubspotProperty: string
+    //   - direction: string ('wix-to-hubspot', 'hubspot-to-wix', 'bi-directional')
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasOnlyAllowedFields(allowedFields) {
+      return request.resource.data.keys().hasOnly(allowedFields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidHubSpotConnection(userId) {
+      return request.resource.data.userId == userId &&
+             request.resource.data.hubDomain is string &&
+             request.resource.data.hubDomain.size() > 0 &&
+             request.resource.data.hubDomain.size() < 100;
+    }
+
+    function isValidMapping() {
+      return request.resource.data.wixField is string &&
+             request.resource.data.wixField.size() > 0 &&
+             request.resource.data.wixField.size() < 100 &&
+             request.resource.data.hubspotProperty is string &&
+             request.resource.data.hubspotProperty.size() > 0 &&
+             request.resource.data.hubspotProperty.size() < 100 &&
+             request.resource.data.direction in ['wix-to-hubspot', 'hubspot-to-wix', 'bi-directional'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      match /mappings/{mappingId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidMapping();
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /hubspot_connections/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidHubSpotConnection(userId);
+      allow delete: if isOwner(userId);
+    }
+  }
+}
