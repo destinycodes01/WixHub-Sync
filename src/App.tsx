@@ -44,9 +44,12 @@ export default function App() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ArrowLeftRight className="w-8 h-8 text-blue-600" />
-          </div>
+          <img 
+            src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
+            alt="WixHub Sync Logo" 
+            className="w-24 h-24 mx-auto mb-4 object-contain" 
+            referrerPolicy="no-referrer" 
+          />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">WixHub Sync</h1>
           <p className="text-gray-500 mb-8">Connect your Wix site with HubSpot seamlessly.</p>
           <button
@@ -66,9 +69,12 @@ export default function App() {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200 flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <ArrowLeftRight className="w-5 h-5 text-white" />
-          </div>
+          <img 
+            src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
+            alt="WixHub Sync Logo" 
+            className="w-8 h-8 object-contain" 
+            referrerPolicy="no-referrer" 
+          />
           <span className="text-xl font-bold text-gray-900">WixHub Sync</span>
         </div>
         
