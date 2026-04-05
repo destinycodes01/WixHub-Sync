@@ -110,8 +110,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           
           <div className="mt-16 pt-8 border-t border-neutral-border/50 flex flex-wrap justify-center gap-8 text-sm text-neutral-subtext font-medium">
             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-orange-main" /> No credit card required</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-orange-main" /> 14-day free trial</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-orange-main" /> Cancel anytime</div>
+            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-orange-main" /> All day free not trial</div>
+            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-orange-main" /> Use anytime</div>
           </div>
         </motion.div>
       </section>
