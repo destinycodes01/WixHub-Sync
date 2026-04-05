@@ -109,8 +109,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           </div>
           <div className="flex-1">
             <img 
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" 
-              alt="Data synchronization and analytics dashboard" 
+              src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80" 
+              alt="Team working on software integration" 
               className="rounded-xl shadow-lg w-full object-cover border border-neutral-border"
               referrerPolicy="no-referrer"
             />
