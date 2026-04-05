@@ -1,4 +1,4 @@
-import { ArrowLeftRight, ShieldCheck, LayoutDashboard, FormInput, Zap, Twitter, Github, Linkedin } from 'lucide-react';
+import { ArrowLeftRight, ShieldCheck, LayoutDashboard, FormInput, Zap, Twitter, Github, Linkedin, Send } from 'lucide-react';
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -7,27 +7,39 @@ interface LandingPageProps {
 export default function LandingPage({ onLogin }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-neutral-bg text-neutral-text font-sans">
-      {/* Navbar */}
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <img 
-            src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
-            alt="WixHub Sync Logo" 
-            className="w-8 h-8 object-contain" 
-            referrerPolicy="no-referrer" 
-          />
-          <span className="text-xl font-bold text-brand-blue-main">WixHub Sync</span>
+      {/* Sticky Navbar */}
+      <nav className="sticky top-0 z-50 bg-neutral-bg/90 backdrop-blur-md border-b border-neutral-border">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
+              alt="WixHub Sync Logo" 
+              className="w-8 h-8 object-contain" 
+              referrerPolicy="no-referrer" 
+            />
+            <span className="text-xl font-bold text-brand-blue-main">WixHub Sync</span>
+          </div>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-subtext">
+            <a href="#home" className="hover:text-brand-blue-main transition-colors">Home</a>
+            <a href="#about" className="hover:text-brand-blue-main transition-colors">About</a>
+            <a href="#features" className="hover:text-brand-blue-main transition-colors">Features</a>
+            <a href="#usage" className="hover:text-brand-blue-main transition-colors">Usage</a>
+            <a href="#contact" className="hover:text-brand-blue-main transition-colors">Contact</a>
+          </div>
+
+          <button 
+            onClick={onLogin} 
+            className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm"
+          >
+            Sign In
+          </button>
         </div>
-        <button 
-          onClick={onLogin} 
-          className="text-brand-blue-main font-medium hover:text-brand-orange-main transition-colors"
-        >
-          Sign In
-        </button>
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20 text-center">
+      <section id="home" className="container mx-auto px-6 py-20 text-center scroll-mt-20">
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-brand-blue-main mb-6 max-w-4xl mx-auto leading-tight">
           Sync your Wix contacts with HubSpot seamlessly
         </h1>
@@ -52,8 +64,31 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-20 bg-neutral-card border-y border-neutral-border scroll-mt-20">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+          <div className="flex-1">
+            <h2 className="text-3xl font-bold text-brand-blue-main mb-6">About WixHub Sync</h2>
+            <p className="text-neutral-subtext mb-4 leading-relaxed">
+              WixHub Sync was born out of a simple necessity: bridging the gap between Wix's powerful website builder and HubSpot's industry-leading CRM. We realized that businesses were spending countless hours manually transferring leads, risking data loss and human error.
+            </p>
+            <p className="text-neutral-subtext leading-relaxed">
+              Our mission is to empower marketing and sales teams by providing a seamless, secure, and real-time synchronization tool. Whether you are capturing new leads through Wix forms or updating contact details in HubSpot, WixHub Sync ensures your data is always accurate and actionable.
+            </p>
+          </div>
+          <div className="flex-1">
+            <img 
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" 
+              alt="Data synchronization and analytics dashboard" 
+              className="rounded-xl shadow-lg w-full object-cover border border-neutral-border"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="bg-neutral-card py-20 border-y border-neutral-border">
+      <section id="features" className="bg-neutral-bg py-20 scroll-mt-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-brand-blue-main mb-4">Powerful Features</h2>
@@ -61,7 +96,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Feature 1 */}
-            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-bg group">
+            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-card group">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-brand-blue-main group-hover:scale-110 transition-transform">
                 <ArrowLeftRight className="w-6 h-6" />
               </div>
@@ -69,7 +104,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               <p className="text-neutral-subtext text-sm">Keep data consistent across both platforms. Changes in Wix reflect in HubSpot and vice versa.</p>
             </div>
             {/* Feature 2 */}
-            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-bg group">
+            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-card group">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 text-brand-orange-main group-hover:scale-110 transition-transform">
                 <ShieldCheck className="w-6 h-6" />
               </div>
@@ -77,7 +112,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               <p className="text-neutral-subtext text-sm">Enterprise-grade security ensures your CRM data and credentials remain completely safe.</p>
             </div>
             {/* Feature 3 */}
-            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-bg group">
+            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-card group">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-brand-blue-main group-hover:scale-110 transition-transform">
                 <LayoutDashboard className="w-6 h-6" />
               </div>
@@ -85,7 +120,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               <p className="text-neutral-subtext text-sm">Intuitive dashboard to map custom Wix fields to standard or custom HubSpot properties.</p>
             </div>
             {/* Feature 4 */}
-            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-bg group">
+            <div className="p-6 rounded-xl border border-neutral-border hover:shadow-lg transition-shadow bg-neutral-card group">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 text-brand-orange-main group-hover:scale-110 transition-transform">
                 <FormInput className="w-6 h-6" />
               </div>
@@ -97,7 +132,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-neutral-bg">
+      <section id="usage" className="py-20 bg-neutral-card border-y border-neutral-border scroll-mt-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-brand-blue-main mb-4">How It Works</h2>
@@ -121,6 +156,61 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               <h3 className="text-xl font-semibold mb-2 text-neutral-text">Sync Automatically</h3>
               <p className="text-neutral-subtext text-sm">Sit back and relax. Your data now flows seamlessly in real-time.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-neutral-bg scroll-mt-20">
+        <div className="container mx-auto px-6 max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-brand-blue-main mb-4">Get in Touch</h2>
+            <p className="text-neutral-subtext">Have questions about WixHub Sync? We'd love to hear from you.</p>
+          </div>
+          <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border p-8">
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-text mb-2">First Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-light bg-neutral-bg" 
+                    placeholder="John" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-text mb-2">Last Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-light bg-neutral-bg" 
+                    placeholder="Doe" 
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-text mb-2">Email Address</label>
+                <input 
+                  type="email" 
+                  className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-light bg-neutral-bg" 
+                  placeholder="john@example.com" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-text mb-2">Message</label>
+                <textarea 
+                  rows={4} 
+                  className="w-full px-4 py-2 border border-neutral-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-light bg-neutral-bg" 
+                  placeholder="How can we help you?"
+                ></textarea>
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-brand-blue-main text-white font-medium py-3 rounded-lg hover:bg-brand-blue-light transition-colors flex items-center justify-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                Send Message
+              </button>
+            </form>
           </div>
         </div>
       </section>
@@ -154,8 +244,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             <span className="text-lg font-bold text-neutral-subtext">WixHub Sync</span>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-neutral-subtext">
-            <a href="#" className="hover:text-brand-blue-main transition-colors">About</a>
-            <a href="#" className="hover:text-brand-blue-main transition-colors">Contact</a>
+            <a href="#about" className="hover:text-brand-blue-main transition-colors">About</a>
+            <a href="#contact" className="hover:text-brand-blue-main transition-colors">Contact</a>
             <a href="#" className="hover:text-brand-blue-main transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-brand-blue-main transition-colors">Terms of Service</a>
           </div>
