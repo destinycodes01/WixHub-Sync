@@ -71,7 +71,7 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="relative container mx-auto px-6 pt-32 pb-24 text-center scroll-mt-20 overflow-hidden">
+      <section id="home" className="relative container mx-auto px-6 pt-[29px] pb-24 text-center scroll-mt-20 overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue-light/10 rounded-full blur-3xl -z-10"></div>
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-orange-main/5 rounded-full blur-3xl -z-10"></div>
