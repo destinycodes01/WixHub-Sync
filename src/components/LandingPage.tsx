@@ -1,10 +1,13 @@
-import { ArrowLeftRight, ShieldCheck, LayoutDashboard, FormInput, Zap, Twitter, Github, Linkedin, Send } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeftRight, ShieldCheck, LayoutDashboard, FormInput, Zap, Twitter, Github, Linkedin, Send, Menu, X } from 'lucide-react';
 
 interface LandingPageProps {
   onLogin: () => void;
 }
 
 export default function LandingPage({ onLogin }: LandingPageProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-neutral-bg text-neutral-text font-sans">
       {/* Sticky Navbar */}
@@ -29,13 +32,41 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             <a href="#contact" className="hover:text-brand-blue-main transition-colors">Contact</a>
           </div>
 
+          <div className="hidden md:block">
+            <button 
+              onClick={onLogin} 
+              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm"
+            >
+              Sign In
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
           <button 
-            onClick={onLogin} 
-            className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm"
+            className="md:hidden p-2 text-neutral-text hover:bg-neutral-border rounded-lg transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
           >
-            Sign In
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-neutral-bg border-t border-neutral-border px-6 py-4 flex flex-col gap-4 shadow-lg absolute w-full left-0">
+            <a href="#home" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">Home</a>
+            <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">About</a>
+            <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">Features</a>
+            <a href="#usage" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">Usage</a>
+            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">Contact</a>
+            <button 
+              onClick={() => { setIsMobileMenuOpen(false); onLogin(); }} 
+              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm w-full mt-2"
+            >
+              Sign In
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
