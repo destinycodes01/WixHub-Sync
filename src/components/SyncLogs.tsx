@@ -50,33 +50,33 @@ export default function SyncLogs({ user }: SyncLogsProps) {
   }, [user.uid]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
+      <div className="p-6 border-b border-neutral-border flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Sync Logs</h2>
-          <p className="text-sm text-gray-500 mt-1">Recent activity and synchronization events.</p>
+          <h2 className="text-lg font-semibold text-neutral-text">Sync Logs</h2>
+          <p className="text-sm text-neutral-subtext mt-1">Recent activity and synchronization events.</p>
         </div>
         <button
           onClick={fetchLogs}
-          className="p-2 text-gray-500 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50"
+          className="p-2 text-neutral-subtext hover:text-brand-blue-main transition-colors rounded-lg hover:bg-brand-blue-main/10"
           title="Refresh logs"
         >
           <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
       
-      <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+      <div className="divide-y divide-neutral-border max-h-[600px] overflow-y-auto">
         {loading && logs.length === 0 ? (
           <div className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-main"></div>
           </div>
         ) : logs.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-neutral-subtext">
             No sync logs found.
           </div>
         ) : (
           logs.map((log) => (
-            <div key={log.id} className="p-4 hover:bg-gray-50 transition-colors flex items-start gap-4">
+            <div key={log.id} className="p-4 hover:bg-neutral-bg transition-colors flex items-start gap-4">
               <div className="mt-1">
                 {log.status === 'success' ? (
                   <CheckCircle2 className="w-5 h-5 text-green-500" />
@@ -85,10 +85,10 @@ export default function SyncLogs({ user }: SyncLogsProps) {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">{log.message}</p>
-                <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                <p className="text-sm font-medium text-neutral-text">{log.message}</p>
+                <div className="mt-1 flex items-center gap-4 text-xs text-neutral-subtext">
                   <span className="flex items-center gap-1">
-                    <span className={`w-2 h-2 rounded-full ${log.source === 'wix' ? 'bg-blue-500' : 'bg-orange-500'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${log.source === 'wix' ? 'bg-brand-blue-main' : 'bg-brand-orange-main'}`}></span>
                     {log.source === 'wix' ? 'Wix → HubSpot' : 'HubSpot → Wix'}
                   </span>
                   <span className="flex items-center gap-1">

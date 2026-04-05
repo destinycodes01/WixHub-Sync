@@ -81,10 +81,10 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">HubSpot Integration</h2>
-        <p className="text-sm text-gray-500 mt-1">Connect your HubSpot account to enable bi-directional syncing.</p>
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
+      <div className="p-6 border-b border-neutral-border">
+        <h2 className="text-lg font-semibold text-neutral-text">HubSpot Integration</h2>
+        <p className="text-sm text-neutral-subtext mt-1">Connect your HubSpot account to enable bi-directional syncing.</p>
       </div>
       
       <div className="p-6">
@@ -106,17 +106,17 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
             </button>
           </div>
         ) : (
-          <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between bg-neutral-bg border border-neutral-border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-6 h-6 text-gray-400" />
+              <AlertCircle className="w-6 h-6 text-neutral-subtext" />
               <div>
-                <p className="text-sm font-medium text-gray-900">Not Connected</p>
-                <p className="text-xs text-gray-500">Authorize WixHub Sync to access your HubSpot data.</p>
+                <p className="text-sm font-medium text-neutral-text">Not Connected</p>
+                <p className="text-xs text-neutral-subtext">Authorize WixHub Sync to access your HubSpot data.</p>
               </div>
             </div>
             <button
               onClick={handleConnect}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-orange-main rounded-lg hover:bg-brand-orange-dark transition-colors shadow-sm"
             >
               <LinkIcon className="w-4 h-4" />
               Connect Account

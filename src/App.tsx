@@ -46,61 +46,63 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-neutral-bg flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex items-center gap-3">
-          <img 
-            src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
-            alt="WixHub Sync Logo" 
-            className="w-8 h-8 object-contain" 
-            referrerPolicy="no-referrer" 
-          />
-          <span className="text-xl font-bold text-gray-900">WixHub Sync</span>
+      <aside className="w-64 bg-brand-blue-main border-r border-brand-blue-dark flex flex-col text-white">
+        <div className="p-6 border-b border-brand-blue-dark flex items-center gap-3">
+          <div className="bg-white rounded-lg p-1">
+            <img 
+              src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
+              alt="WixHub Sync Logo" 
+              className="w-8 h-8 object-contain" 
+              referrerPolicy="no-referrer" 
+            />
+          </div>
+          <span className="text-xl font-bold text-white">WixHub Sync</span>
         </div>
         
         <nav className="flex-1 p-4 space-y-1">
           <button
             onClick={() => setActiveTab('connection')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'connection' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'connection' ? 'bg-brand-blue-dark text-white' : 'text-blue-200 hover:bg-brand-blue-light/20 hover:text-white'}`}
           >
             <LinkIcon className="w-5 h-5" />
             HubSpot Connection
           </button>
           <button
             onClick={() => setActiveTab('mapping')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'mapping' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'mapping' ? 'bg-brand-blue-dark text-white' : 'text-blue-200 hover:bg-brand-blue-light/20 hover:text-white'}`}
           >
             <LayoutDashboard className="w-5 h-5" />
             Field Mapping
           </button>
           <button
             onClick={() => setActiveTab('forms')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'forms' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'forms' ? 'bg-brand-blue-dark text-white' : 'text-blue-200 hover:bg-brand-blue-light/20 hover:text-white'}`}
           >
             <FormInput className="w-5 h-5" />
             Form Integration
           </button>
           <button
             onClick={() => setActiveTab('logs')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'logs' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'logs' ? 'bg-brand-blue-dark text-white' : 'text-blue-200 hover:bg-brand-blue-light/20 hover:text-white'}`}
           >
             <Settings className="w-5 h-5" />
             Sync Logs
           </button>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-brand-blue-dark">
           <div className="flex items-center gap-3 mb-4">
-            <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`} alt="User" className="w-10 h-10 rounded-full" />
+            <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`} alt="User" className="w-10 h-10 rounded-full border-2 border-brand-blue-light" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user.displayName || 'User'}</p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              <p className="text-sm font-medium text-white truncate">{user.displayName || 'User'}</p>
+              <p className="text-xs text-blue-200 truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-brand-blue-dark rounded-lg hover:bg-red-500 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sign Out

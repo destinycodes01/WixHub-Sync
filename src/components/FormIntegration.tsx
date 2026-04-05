@@ -18,45 +18,45 @@ export default function FormIntegration({ user }: FormIntegrationProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Form Integration</h2>
-        <p className="text-sm text-gray-500 mt-1">Capture leads from your Wix forms directly into HubSpot.</p>
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
+      <div className="p-6 border-b border-neutral-border">
+        <h2 className="text-lg font-semibold text-neutral-text">Form Integration</h2>
+        <p className="text-sm text-neutral-subtext mt-1">Capture leads from your Wix forms directly into HubSpot.</p>
       </div>
       
       <div className="p-6 space-y-8">
         {/* Option 1: Webhook */}
         <div>
-          <h3 className="text-md font-medium text-gray-900 mb-3 flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">1</span>
+          <h3 className="text-md font-medium text-neutral-text mb-3 flex items-center gap-2">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-blue-main/10 text-brand-blue-main text-sm font-bold">1</span>
             Use Wix Automations (Recommended)
           </h3>
-          <p className="text-sm text-gray-600 mb-4 ml-8">
+          <p className="text-sm text-neutral-subtext mb-4 ml-8">
             Set up a Wix Automation to send form submissions to this webhook URL. We will automatically map the fields based on your configuration and create/update the contact in HubSpot.
           </p>
           <div className="ml-8 flex items-center gap-3">
-            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 font-mono text-sm text-gray-700 truncate">
+            <div className="flex-1 bg-neutral-bg border border-neutral-border rounded-lg px-4 py-3 font-mono text-sm text-neutral-text truncate">
               {webhookUrl}
             </div>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-white bg-brand-blue-main rounded-lg hover:bg-brand-blue-light transition-colors shadow-sm"
             >
-              {copied ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+              {copied ? <CheckCircle2 className="w-4 h-4 text-green-300" /> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy URL'}
             </button>
           </div>
         </div>
 
-        <hr className="border-gray-100" />
+        <hr className="border-neutral-border" />
 
         {/* Option 2: Embed Code */}
         <div>
-          <h3 className="text-md font-medium text-gray-900 mb-3 flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">2</span>
+          <h3 className="text-md font-medium text-neutral-text mb-3 flex items-center gap-2">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-blue-main/10 text-brand-blue-main text-sm font-bold">2</span>
             Embed HubSpot Form
           </h3>
-          <p className="text-sm text-gray-600 mb-4 ml-8">
+          <p className="text-sm text-neutral-subtext mb-4 ml-8">
             Alternatively, you can embed a HubSpot form directly on your Wix site using an HTML iframe. This bypasses Wix forms entirely.
           </p>
           <div className="ml-8 bg-gray-900 rounded-lg p-4 relative group">

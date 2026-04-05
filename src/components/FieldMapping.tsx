@@ -89,16 +89,16 @@ export default function FieldMapping({ user }: FieldMappingProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
+      <div className="p-6 border-b border-neutral-border flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Field Mapping</h2>
-          <p className="text-sm text-gray-500 mt-1">Configure how data flows between Wix and HubSpot.</p>
+          <h2 className="text-lg font-semibold text-neutral-text">Field Mapping</h2>
+          <p className="text-sm text-neutral-subtext mt-1">Configure how data flows between Wix and HubSpot.</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-orange-main rounded-lg hover:bg-brand-orange-dark transition-colors disabled:opacity-50 shadow-sm"
         >
           <Save className="w-4 h-4" />
           {saving ? 'Saving...' : 'Save Mappings'}
@@ -106,52 +106,52 @@ export default function FieldMapping({ user }: FieldMappingProps) {
       </div>
       
       <div className="p-6">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg border border-neutral-border">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="pb-3 text-sm font-medium text-gray-500">Wix Field</th>
-                <th className="pb-3 text-sm font-medium text-gray-500 text-center">Sync Direction</th>
-                <th className="pb-3 text-sm font-medium text-gray-500">HubSpot Property</th>
-                <th className="pb-3 text-sm font-medium text-gray-500 w-10"></th>
+            <thead className="bg-gray-50">
+              <tr className="border-b border-neutral-border">
+                <th className="px-4 py-3 text-sm font-medium text-neutral-subtext">Wix Field</th>
+                <th className="px-4 py-3 text-sm font-medium text-neutral-subtext text-center">Sync Direction</th>
+                <th className="px-4 py-3 text-sm font-medium text-neutral-subtext">HubSpot Property</th>
+                <th className="px-4 py-3 text-sm font-medium text-neutral-subtext w-10"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-neutral-border bg-white">
               {mappings.map((mapping) => (
                 <tr key={mapping.id}>
-                  <td className="py-3 pr-4">
+                  <td className="py-3 px-4">
                     <input
                       type="text"
                       value={mapping.wixField}
                       onChange={(e) => handleChange(mapping.id, 'wixField', e.target.value)}
                       placeholder="e.g., firstName"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-neutral-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-light text-neutral-text"
                     />
                   </td>
                   <td className="py-3 px-4 text-center">
                     <select
                       value={mapping.direction}
                       onChange={(e) => handleChange(mapping.id, 'direction', e.target.value as any)}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="px-3 py-2 border border-neutral-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-light bg-white text-neutral-text"
                     >
                       <option value="bi-directional">Bi-directional (↔)</option>
                       <option value="wix-to-hubspot">Wix to HubSpot (→)</option>
                       <option value="hubspot-to-wix">HubSpot to Wix (←)</option>
                     </select>
                   </td>
-                  <td className="py-3 pl-4">
+                  <td className="py-3 px-4">
                     <input
                       type="text"
                       value={mapping.hubspotProperty}
                       onChange={(e) => handleChange(mapping.id, 'hubspotProperty', e.target.value)}
                       placeholder="e.g., firstname"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-neutral-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-light text-neutral-text"
                     />
                   </td>
-                  <td className="py-3 pl-4 text-right">
+                  <td className="py-3 px-4 text-right">
                     <button
                       onClick={() => handleRemoveMapping(mapping.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
+                      className="p-2 text-neutral-subtext hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -164,7 +164,7 @@ export default function FieldMapping({ user }: FieldMappingProps) {
         
         <button
           onClick={handleAddMapping}
-          className="mt-4 flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="mt-4 flex items-center gap-2 text-sm font-medium text-brand-blue-main hover:text-brand-blue-light transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Field Mapping

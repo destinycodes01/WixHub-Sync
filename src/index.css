@@ -5,9 +5,17 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --color-brand-blue: #1E3A8A;
-  --color-brand-orange: #F97316;
-  --color-brand-bg: #F8FAFC;
-  --color-brand-text: #0F172A;
-  --color-brand-border: #E5E7EB;
+  --color-brand-blue-main: #1E3A8A;
+  --color-brand-blue-light: #3B82F6;
+  --color-brand-blue-dark: #0F172A;
+  
+  --color-brand-orange-main: #F97316;
+  --color-brand-orange-light: #FB923C;
+  --color-brand-orange-dark: #EA580C;
+  
+  --color-neutral-bg: #F8FAFC;
+  --color-neutral-card: #FFFFFF;
+  --color-neutral-border: #E5E7EB;
+  --color-neutral-text: #0F172A;
+  --color-neutral-subtext: #64748B;
 }
