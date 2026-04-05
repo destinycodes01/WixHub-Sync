@@ -6,6 +6,7 @@ import ConnectionPanel from './components/ConnectionPanel';
 import FieldMapping from './components/FieldMapping';
 import SyncLogs from './components/SyncLogs';
 import FormIntegration from './components/FormIntegration';
+import LandingPage from './components/LandingPage';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -41,27 +42,7 @@ export default function App() {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <img 
-            src="https://i.ibb.co/K3pyhF3/wixhublogo-removedbg.png" 
-            alt="WixHub Sync Logo" 
-            className="w-24 h-24 mx-auto mb-4 object-contain" 
-            referrerPolicy="no-referrer" 
-          />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">WixHub Sync</h1>
-          <p className="text-gray-500 mb-8">Connect your Wix site with HubSpot seamlessly.</p>
-          <button
-            onClick={handleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium transition-all duration-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-400 active:scale-[0.98] active:bg-gray-100"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-            Sign in with Google
-          </button>
-        </div>
-      </div>
-    );
+    return <LandingPage onLogin={handleLogin} />;
   }
 
   return (

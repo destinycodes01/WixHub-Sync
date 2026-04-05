@@ -4,4 +4,10 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-brand-blue: #1E3A8A;
+  --color-brand-orange: #F97316;
+  --color-brand-bg: #F8FAFC;
+  --color-brand-text: #0F172A;
+  --color-brand-border: #E5E7EB;
 }
