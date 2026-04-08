@@ -34,17 +34,101 @@
           "type": "string",
           "description": "The connected HubSpot domain."
         },
-        "connectedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "When the connection was established."
+        "access_token": {
+          "type": "string"
         },
-        "mockToken": {
+        "refresh_token": {
+          "type": "string"
+        },
+        "expires_in": {
+          "type": "number"
+        },
+        "hub_id": {
+          "type": "number"
+        },
+        "createdAt": {
           "type": "string",
-          "description": "Mock OAuth token for demonstration."
+          "format": "date-time"
         }
       },
-      "required": ["userId", "hubDomain"]
+      "required": ["userId"]
+    },
+    "WixConnection": {
+      "title": "Wix Connection",
+      "description": "Stores the OAuth connection details for Wix.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId"]
+    },
+    "ContactMapping": {
+      "title": "Contact Mapping",
+      "description": "Loop prevention mapping for contacts.",
+      "type": "object",
+      "properties": {
+        "wixContactId": {
+          "type": "string"
+        },
+        "hubspotContactId": {
+          "type": "string"
+        },
+        "lastSyncedAt": {
+          "type": "number"
+        },
+        "source": {
+          "type": "string"
+        },
+        "syncId": {
+          "type": "string"
+        }
+      },
+      "required": ["wixContactId", "hubspotContactId", "lastSyncedAt", "source", "syncId"]
+    },
+    "SyncLog": {
+      "title": "Sync Log",
+      "description": "Audit log for sync operations.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "operationType": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "wixContactId": {
+          "type": "string"
+        },
+        "hubspotContactId": {
+          "type": "string"
+        }
+      },
+      "required": ["userId", "timestamp", "operationType", "source", "status", "message"]
     },
     "FieldMapping": {
       "title": "Field Mapping",
@@ -84,6 +168,24 @@
         "$ref": "#/entities/HubSpotConnection"
       },
       "description": "Stores HubSpot OAuth connection details per user."
+    },
+    "/wix_connections/{userId}": {
+      "schema": {
+        "$ref": "#/entities/WixConnection"
+      },
+      "description": "Stores Wix OAuth connection details per user."
+    },
+    "/contact_mappings/{syncId}": {
+      "schema": {
+        "$ref": "#/entities/ContactMapping"
+      },
+      "description": "Stores contact mappings to prevent sync loops."
+    },
+    "/sync_logs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/SyncLog"
+      },
+      "description": "Stores sync audit logs."
     },
     "/users/{userId}/mappings/{mappingId}": {
       "schema": {

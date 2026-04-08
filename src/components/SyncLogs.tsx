@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { db } from '../firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { CheckCircle2, XCircle, Clock, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -24,23 +24,30 @@ export default function SyncLogs({ user }: SyncLogsProps) {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      // In a real app, we'd fetch from Firestore
-      // const q = query(collection(db, `users/${user.uid}/logs`), orderBy('timestamp', 'desc'), limit(50));
-      // const querySnapshot = await getDocs(q);
-      // ...
+      const q = query(
+        collection(db, 'sync_logs'),
+        where('userId', '==', user.uid),
+        orderBy('timestamp', 'desc'),
+        limit(50)
+      );
+      const querySnapshot = await getDocs(q);
       
-      // For demo, we'll use mock data
-      setTimeout(() => {
-        setLogs([
-          { id: '1', source: 'wix', status: 'success', message: 'Synced contact: john.doe@example.com', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
-          { id: '2', source: 'hubspot', status: 'success', message: 'Updated contact: jane.smith@example.com', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
-          { id: '3', source: 'wix', status: 'error', message: 'Failed to sync: Invalid email format', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() },
-          { id: '4', source: 'wix', status: 'success', message: 'Form submission synced: Contact Us', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() },
-        ]);
-        setLoading(false);
-      }, 500);
+      const fetchedLogs: Log[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        fetchedLogs.push({
+          id: doc.id,
+          source: data.source,
+          status: data.status,
+          message: data.message,
+          timestamp: data.timestamp,
+        });
+      });
+      
+      setLogs(fetchedLogs);
     } catch (error) {
       console.error("Error fetching logs:", error);
+    } finally {
       setLoading(false);
     }
   };

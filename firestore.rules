@@ -19,8 +19,40 @@ service cloud.firestore {
     // Fields:
     //   - userId: string
     //   - hubDomain: string
-    //   - connectedAt: string
-    //   - mockToken: string
+    //   - access_token: string
+    //   - refresh_token: string
+    //   - expires_in: number
+    //   - hub_id: number
+    //   - createdAt: timestamp
+    //
+    // Collection: wix_connections
+    // Document ID: {userId}
+    // Fields:
+    //   - userId: string
+    //   - access_token: string
+    //   - refresh_token: string
+    //   - createdAt: timestamp
+    //
+    // Collection: contact_mappings
+    // Document ID: {syncId}
+    // Fields:
+    //   - wixContactId: string
+    //   - hubspotContactId: string
+    //   - lastSyncedAt: number
+    //   - source: string
+    //   - syncId: string
+    //
+    // Collection: sync_logs
+    // Document ID: {logId}
+    // Fields:
+    //   - userId: string
+    //   - timestamp: string
+    //   - operationType: string
+    //   - source: string
+    //   - status: string
+    //   - message: string
+    //   - wixContactId: string
+    //   - hubspotContactId: string
     //
     // Collection: users/{userId}/mappings
     // Document ID: {mappingId}
@@ -53,10 +85,11 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidHubSpotConnection(userId) {
-      return request.resource.data.userId == userId &&
-             request.resource.data.hubDomain is string &&
-             request.resource.data.hubDomain.size() > 0 &&
-             request.resource.data.hubDomain.size() < 100;
+      return request.resource.data.userId == userId;
+    }
+
+    function isValidWixConnection(userId) {
+      return request.resource.data.userId == userId;
     }
 
     function isValidMapping() {
@@ -87,6 +120,23 @@ service cloud.firestore {
       allow read: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidHubSpotConnection(userId);
       allow delete: if isOwner(userId);
+    }
+
+    match /wix_connections/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidWixConnection(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    match /contact_mappings/{syncId} {
+      // Backend handles this collection, but if frontend needs it:
+      allow read: if isAuthenticated();
+      allow write: if false; // Only backend should write here
+    }
+
+    match /sync_logs/{logId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend should write here
     }
   }
 }
