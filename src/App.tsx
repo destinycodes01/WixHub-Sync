@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { auth, googleProvider } from './firebase';
-import { signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { LayoutDashboard, ArrowLeftRight, Settings, LogOut, Link as LinkIcon, FormInput } from 'lucide-react';
 import ConnectionPanel from './components/ConnectionPanel';
 import FieldMapping from './components/FieldMapping';
@@ -12,8 +12,29 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('connection');
+  
+  // Premium Login States
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   useEffect(() => {
+    // Handle redirect result for smart fallback
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          setLoginSuccess(true);
+          setTimeout(() => setLoginSuccess(false), 3000);
+        }
+      } catch (error: any) {
+        console.error('Redirect login failed:', error);
+        setLoginError(getErrorMessage(error));
+      }
+    };
+    
+    handleRedirectResult();
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
@@ -21,14 +42,52 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleLogin = async () => {
+  const getErrorMessage = (error: any) => {
+    if (error.code === 'auth/popup-closed-by-user') return 'Login was cancelled. Please try again.';
+    if (error.code === 'auth/network-request-failed') return 'Network error. Please check your connection or VPN.';
+    if (error.code === 'auth/popup-blocked') return 'Popup blocked by browser. Attempting redirect...';
+    return 'An error occurred during login. Please try again.';
+  };
+
+  // Premium Google Login with Smart Fallback
+  const premiumGoogleLogin = async () => {
+    if (isLoggingIn) return;
+    
+    setIsLoggingIn(true);
+    setLoginError(null);
+    setLoginSuccess(false);
+    
     try {
+      // 1. Try popup first (Premium experience)
       await signInWithPopup(auth, googleProvider);
+      setLoginSuccess(true);
+      setTimeout(() => setLoginSuccess(false), 3000);
+      setIsLoggingIn(false);
     } catch (error: any) {
-      if (error.code === 'auth/popup-closed-by-user') {
-        console.log('Login popup closed by user.');
+      console.error('Popup login failed:', error);
+      
+      // 2. Smart Fallback: If it's a network error, popup blocked, or cross-origin issue, fallback to redirect
+      if (
+        error.code === 'auth/popup-blocked' ||
+        error.code === 'auth/network-request-failed' ||
+        error.code === 'auth/internal-error' ||
+        error.message?.includes('timeout') ||
+        error.message?.includes('network')
+      ) {
+        console.log('Falling back to redirect login...');
+        setLoginError('Popup failed. Redirecting to secure login...');
+        
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          // The page will redirect, so code below might not execute
+        } catch (redirectError: any) {
+          console.error('Redirect login also failed:', redirectError);
+          setLoginError(getErrorMessage(redirectError));
+          setIsLoggingIn(false);
+        }
       } else {
-        console.error('Login failed:', error);
+        setLoginError(getErrorMessage(error));
+        setIsLoggingIn(false);
       }
     }
   };
@@ -42,7 +101,12 @@ export default function App() {
   }
 
   if (!user) {
-    return <LandingPage onLogin={handleLogin} />;
+    return <LandingPage 
+      onLogin={premiumGoogleLogin} 
+      isLoggingIn={isLoggingIn}
+      loginError={loginError}
+      loginSuccess={loginSuccess}
+    />;
   }
 
   return (

@@ -4,13 +4,45 @@ import { motion } from 'motion/react';
 
 interface LandingPageProps {
   onLogin: () => void;
+  isLoggingIn?: boolean;
+  loginError?: string | null;
+  loginSuccess?: boolean;
 }
 
-export default function LandingPage({ onLogin }: LandingPageProps) {
+export default function LandingPage({ onLogin, isLoggingIn, loginError, loginSuccess }: LandingPageProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-neutral-bg text-neutral-text font-sans">
+      {/* Toast Notifications */}
+      {(loginError || loginSuccess) && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-4 rounded-xl shadow-lg border flex items-start gap-3 ${
+              loginError 
+                ? 'bg-red-50 border-red-200 text-red-800' 
+                : 'bg-green-50 border-green-200 text-green-800'
+            }`}
+          >
+            {loginError ? (
+              <ShieldCheck className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+            ) : (
+              <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+            )}
+            <div>
+              <h4 className="font-semibold text-sm">
+                {loginError ? 'Authentication Error' : 'Login Successful'}
+              </h4>
+              <p className="text-sm mt-1 opacity-90">
+                {loginError || 'Redirecting to your dashboard...'}
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* Sticky Navbar */}
       <nav className="sticky top-0 z-50 bg-neutral-bg/90 backdrop-blur-md border-b border-neutral-border">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -36,9 +68,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           <div className="hidden md:block">
             <button 
               onClick={onLogin} 
-              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm"
+              disabled={isLoggingIn}
+              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
             >
-              Sign In
+              {isLoggingIn && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+              {isLoggingIn ? 'Signing In...' : 'Sign In'}
             </button>
           </div>
 
@@ -62,9 +96,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-neutral-text font-medium hover:text-brand-blue-main transition-colors">Contact</a>
             <button 
               onClick={() => { setIsMobileMenuOpen(false); onLogin(); }} 
-              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm w-full mt-2"
+              disabled={isLoggingIn}
+              className="bg-brand-blue-main text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-blue-light transition-colors shadow-sm w-full mt-2 disabled:opacity-70 flex items-center justify-center gap-2"
             >
-              Sign In
+              {isLoggingIn && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+              {isLoggingIn ? 'Signing In...' : 'Sign In'}
             </button>
           </div>
         )}
@@ -94,14 +130,20 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={onLogin} 
-              className="bg-brand-blue-main text-white px-8 py-4 rounded-xl font-medium hover:bg-brand-blue-light transition-all duration-300 shadow-[0_8px_30px_rgb(30,58,138,0.3)] hover:shadow-[0_8px_30px_rgb(30,58,138,0.5)] active:scale-95 flex items-center justify-center gap-2 text-lg"
+              disabled={isLoggingIn}
+              className="bg-brand-blue-main text-white px-8 py-4 rounded-xl font-medium hover:bg-brand-blue-light transition-all duration-300 shadow-[0_8px_30px_rgb(30,58,138,0.3)] hover:shadow-[0_8px_30px_rgb(30,58,138,0.5)] active:scale-95 flex items-center justify-center gap-2 text-lg disabled:opacity-70 disabled:active:scale-100"
             >
-              <Zap className="w-5 h-5" />
-              Get Started Free
+              {isLoggingIn ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Zap className="w-5 h-5" />
+              )}
+              {isLoggingIn ? 'Authenticating...' : 'Get Started Free'}
             </button>
             <button 
               onClick={onLogin} 
-              className="bg-white text-neutral-text border border-neutral-border px-8 py-4 rounded-xl font-medium hover:bg-neutral-bg hover:border-brand-blue-main/30 transition-all duration-300 shadow-sm active:scale-95 flex items-center justify-center gap-2 text-lg"
+              disabled={isLoggingIn}
+              className="bg-white text-neutral-text border border-neutral-border px-8 py-4 rounded-xl font-medium hover:bg-neutral-bg hover:border-brand-blue-main/30 transition-all duration-300 shadow-sm active:scale-95 flex items-center justify-center gap-2 text-lg disabled:opacity-70 disabled:active:scale-100"
             >
               <LayoutDashboard className="w-5 h-5 text-brand-blue-main" />
               Open Dashboard
@@ -392,9 +434,11 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button 
                 onClick={onLogin} 
-                className="bg-brand-orange-main text-white px-10 py-4 rounded-xl font-bold hover:bg-brand-orange-dark transition-all duration-300 shadow-[0_8px_30px_rgb(249,115,22,0.3)] hover:shadow-[0_8px_30px_rgb(249,115,22,0.5)] active:scale-95 text-lg"
+                disabled={isLoggingIn}
+                className="bg-brand-orange-main text-white px-10 py-4 rounded-xl font-bold hover:bg-brand-orange-dark transition-all duration-300 shadow-[0_8px_30px_rgb(249,115,22,0.3)] hover:shadow-[0_8px_30px_rgb(249,115,22,0.5)] active:scale-95 text-lg disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
               >
-                Get Started for Free
+                {isLoggingIn && <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                {isLoggingIn ? 'Authenticating...' : 'Get Started for Free'}
               </button>
             </div>
           </motion.div>
