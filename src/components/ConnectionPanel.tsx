@@ -49,9 +49,7 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
 
   const handleConnectHubSpot = async () => {
     try {
-      const response = await fetch(`/api/hubspot/auth?userId=${user.uid}`);
-      const data = await response.json();
-      window.location.href = data.url;
+      window.location.href = `/api/hubspot/auth?userId=${user.uid}`;
     } catch (error) {
       console.error("Failed to start HubSpot OAuth:", error);
     }
@@ -72,9 +70,7 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
 
   const handleConnectWix = async () => {
     try {
-      const response = await fetch(`/api/wix/auth?userId=${user.uid}`);
-      const data = await response.json();
-      window.location.href = data.url;
+      window.location.href = `/api/wix/auth?userId=${user.uid}`;
     } catch (error) {
       console.error("Failed to start Wix OAuth:", error);
     }

@@ -5,24 +5,16 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": { "distDir": "dist" }
-    },
-    {
-      "src": "server.ts",
-      "use": "@vercel/node"
     }
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/server.ts"
-    },
-    {
       "source": "/oauth-callback",
-      "destination": "/server.ts"
+      "destination": "/api/hubspot/callback"
     },
     {
       "source": "/wix/oauth-callback",
-      "destination": "/server.ts"
+      "destination": "/api/wix/callback"
     },
     {
       "source": "/(.*)",
