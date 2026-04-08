@@ -36,17 +36,16 @@ const WIX_CLIENT_ID = process.env.WIX_CLIENT_ID;
 const WIX_CLIENT_SECRET = process.env.WIX_CLIENT_SECRET;
 const WIX_REDIRECT_URI = process.env.WIX_REDIRECT_URI || 'http://localhost:3000/wix/oauth-callback';
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+export const app = express();
+const PORT = process.env.PORT || 3000;
 
-  app.use(cors());
-  app.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-  // API Routes
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'WixHub Sync Backend is running' });
-  });
+// API Routes
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'WixHub Sync Backend is running' });
+});
 
   // ==========================================
   // HUBSPOT OAUTH
@@ -261,24 +260,26 @@ async function startServer() {
     }
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
+// Vite middleware for development
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  createViteServer({
+    server: { middlewareMode: true },
+    appType: 'spa',
+  }).then((vite) => {
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
     });
-  }
-
-  app.listen(PORT, '0.0.0.0', () => {
+  });
+} else if (!process.env.VERCEL) {
+  const distPath = path.join(process.cwd(), 'dist');
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+  app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer();
+export default app;
