@@ -1,24 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/oauth-callback",
-      "destination": "/api/hubspot/callback"
-    },
-    {
-      "source": "/wix/oauth-callback",
-      "destination": "/api/wix/callback"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  }
 }

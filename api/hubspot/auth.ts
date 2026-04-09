@@ -2,11 +2,6 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { userId } = req.query;
-    if (!userId) {
-      return res.status(400).json({ error: 'Missing userId' });
-    }
-
     const clientId = process.env.HUBSPOT_CLIENT_ID;
     const redirectUri = process.env.HUBSPOT_REDIRECT_URI || 'http://localhost:3000/oauth-callback';
 
@@ -17,13 +12,17 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const scope = encodeURIComponent('crm.objects.contacts.read crm.objects.contacts.write');
+    
+    // Make userId optional so direct visits to the URL don't fail with 400
+    const userId = req.query.userId as string | undefined;
+    const stateParam = userId ? `&state=${userId}` : '';
 
     const authUrl =
       "https://app.hubspot.com/oauth/authorize" +
       `?client_id=${clientId}` +
       `&scope=${scope}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&state=${userId}`;
+      stateParam;
 
     return res.redirect(authUrl);
   } catch (error) {
