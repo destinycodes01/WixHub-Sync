@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
-import { db, admin } from '../_lib/firebase';
+import { getDb, firebaseAdmin } from '../_lib/firebase';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { code, state: userId } = req.query;
@@ -28,6 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const hubResponse = await axios.get('https://api.hubapi.com/oauth/v1/access-tokens/' + access_token);
     const hub_id = hubResponse.data.hub_id;
 
+    const db = getDb();
     await db.collection('hubspot_connections').doc(userId as string).set({
       userId,
       access_token,
@@ -35,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       expires_in,
       hub_id,
       hubDomain: `HubSpot ID: ${hub_id}`,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
     });
 
     res.redirect('/?hubspot_connected=success');

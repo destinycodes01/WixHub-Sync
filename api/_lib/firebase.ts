@@ -1,14 +1,34 @@
 import admin from 'firebase-admin';
 
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      projectId: process.env.FIREBASE_PROJECT_ID || 'gen-lang-client-0596835782',
-    });
-  } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+function getFirebaseAdmin() {
+  if (!admin.apps.length) {
+    try {
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+      const projectId = process.env.FIREBASE_PROJECT_ID || 'gen-lang-client-0596835782';
+
+      if (privateKey && clientEmail) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId,
+            clientEmail,
+            privateKey,
+          }),
+        });
+      } else {
+        // Fallback for local development or if ADC is somehow available
+        admin.initializeApp({ projectId });
+      }
+    } catch (error) {
+      console.error('Firebase Admin initialization error:', error);
+    }
   }
+  return admin;
 }
 
-export const db = admin.firestore();
-export { admin };
+export function getDb() {
+  const adminInstance = getFirebaseAdmin();
+  return adminInstance.firestore();
+}
+
+export { admin as firebaseAdmin };

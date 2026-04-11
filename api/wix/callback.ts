@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
-import { db, admin } from '../_lib/firebase';
+import { getDb, firebaseAdmin } from '../_lib/firebase';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { code, state: userId } = req.query;
@@ -21,11 +21,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { access_token, refresh_token } = response.data;
 
+    const db = getDb();
     await db.collection('wix_connections').doc(userId as string).set({
       userId,
       access_token,
       refresh_token,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
     });
 
     res.redirect('/?wix_connected=success');

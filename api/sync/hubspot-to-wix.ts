@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
-import { db } from '../_lib/firebase';
+import { getDb } from '../_lib/firebase';
 
 async function logSync(userId: string, source: 'wix' | 'hubspot', status: 'success' | 'error', message: string, wixContactId?: string, hubspotContactId?: string) {
+  const db = getDb();
   await db.collection('sync_logs').add({
     userId,
     timestamp: new Date().toISOString(),
@@ -22,6 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!userId || !contact) return res.status(400).send('Missing userId or contact');
 
   try {
+    const db = getDb();
     // 1. Get Wix Token
     const wixConn = await db.collection('wix_connections').doc(userId).get();
     if (!wixConn.exists) throw new Error('Wix not connected');
