@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
-import { getDb, firebaseAdmin } from '../_lib/firebase';
+import { getDb, firebaseAdmin } from '../_lib/firebase.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { code, state: userId } = req.query;
