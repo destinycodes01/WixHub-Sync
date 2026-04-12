@@ -15,14 +15,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const HUBSPOT_REDIRECT_URI = process.env.HUBSPOT_REDIRECT_URI;
 
   try {
-    const response = await axios.post('https://api.hubapi.com/oauth/v3/token', null, {
-      params: {
-        grant_type: 'authorization_code',
-        client_id: HUBSPOT_CLIENT_ID,
-        client_secret: HUBSPOT_CLIENT_SECRET,
-        redirect_uri: HUBSPOT_REDIRECT_URI,
-        code,
-      },
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'authorization_code');
+    formData.append('client_id', HUBSPOT_CLIENT_ID || '');
+    formData.append('client_secret', HUBSPOT_CLIENT_SECRET || '');
+    formData.append('redirect_uri', HUBSPOT_REDIRECT_URI || '');
+    formData.append('code', code as string);
+
+    const response = await axios.post('https://api.hubapi.com/oauth/v3/token', formData.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
 
