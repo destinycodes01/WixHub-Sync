@@ -1,4 +1,9 @@
 import admin from 'firebase-admin';
+import { getFirestore } from 'firebase-admin/firestore';
+import config from '../../firebase-applet-config.json' with { type: "json" };
+
+// Read the config file to get the correct database ID
+const databaseId = config.firestoreDatabaseId || '(default)';
 
 function getFirebaseAdmin() {
   if (!admin.apps.length) {
@@ -28,7 +33,8 @@ function getFirebaseAdmin() {
 
 export function getDb() {
   const adminInstance = getFirebaseAdmin();
-  return adminInstance.firestore();
+  // Use the specific named database ID from the config
+  return getFirestore(adminInstance.app(), databaseId);
 }
 
 export { admin as firebaseAdmin };

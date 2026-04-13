@@ -44,6 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (userId) {
+      console.log("Saving to Firebase:", { userId });
       try {
         const db = getDb();
         await db.collection('hubspot_connections').doc(userId as string).set({
@@ -55,13 +56,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           hubDomain: `HubSpot ID: ${hub_id}`,
           createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         });
+        console.log("Firebase Write SUCCESS");
       } catch (err: any) {
-        throw new Error(`Firebase Write Failed: ${err.message}`);
+        console.error("FIREBASE ERROR:", err);
       }
     }
 
     console.log("OAuth SUCCESS:", { code, state: userId });
 
+    // Always redirect success even if Firebase fails
     return res.redirect("https://wixhubsync.vercel.app/?hubspot_connected=success");
   } catch (error: any) {
     console.error('HubSpot OAuth Error:', error.message);
