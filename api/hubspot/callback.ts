@@ -22,34 +22,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     formData.append('redirect_uri', HUBSPOT_REDIRECT_URI || '');
     formData.append('code', code as string);
 
-    const response = await axios.post('https://api.hubapi.com/oauth/v3/token', formData.toString(), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
+    let tokenData;
+    try {
+      const response = await axios.post('https://api.hubapi.com/oauth/v3/token', formData.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      tokenData = response.data;
+    } catch (err: any) {
+      throw new Error(`Token Exchange Failed: ${JSON.stringify(err.response?.data || err.message)}`);
+    }
 
-    const { access_token, refresh_token, expires_in } = response.data;
+    const { access_token, refresh_token, expires_in } = tokenData;
 
     // Fetch Hub ID
-    const hubResponse = await axios.get('https://api.hubapi.com/oauth/v1/access-tokens/' + access_token);
-    const hub_id = hubResponse.data.hub_id;
+    let hub_id;
+    try {
+      const hubResponse = await axios.get('https://api.hubapi.com/oauth/v1/access-tokens/' + access_token);
+      hub_id = hubResponse.data.hub_id;
+    } catch (err: any) {
+      throw new Error(`Hub ID Fetch Failed: ${JSON.stringify(err.response?.data || err.message)}`);
+    }
 
     if (userId) {
-      const db = getDb();
-      await db.collection('hubspot_connections').doc(userId as string).set({
-        userId,
-        access_token,
-        refresh_token,
-        expires_in,
-        hub_id,
-        hubDomain: `HubSpot ID: ${hub_id}`,
-        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-      });
+      try {
+        const db = getDb();
+        await db.collection('hubspot_connections').doc(userId as string).set({
+          userId,
+          access_token,
+          refresh_token,
+          expires_in,
+          hub_id,
+          hubDomain: `HubSpot ID: ${hub_id}`,
+          createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (err: any) {
+        throw new Error(`Firebase Write Failed: ${err.message}`);
+      }
     }
 
     console.log("OAuth SUCCESS:", { code, state: userId });
 
     return res.redirect("https://wixhubsync.vercel.app/?hubspot_connected=success");
   } catch (error: any) {
-    console.error('HubSpot OAuth Error:', error.response?.data || error.message);
-    return res.redirect("https://wixhubsync.vercel.app/?hubspot_connected=error");
+    console.error('HubSpot OAuth Error:', error.message);
+    const encodedError = encodeURIComponent(error.message);
+    return res.redirect(`https://wixhubsync.vercel.app/?hubspot_connected=error&details=${encodedError}`);
   }
 }

@@ -34,8 +34,18 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
 
         // Clean up URL params if returning from OAuth
         const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('hubspot_connected')) {
+          const status = urlParams.get('hubspot_connected');
+          const details = urlParams.get('details');
+          if (status === 'error') {
+            alert(`HubSpot Connection Failed:\n\n${details ? decodeURIComponent(details) : 'Unknown error'}`);
+          }
+        }
+
         if (urlParams.has('hubspot_connected') || urlParams.has('wix_connected')) {
-          window.history.replaceState({}, document.title, window.location.pathname);
+          // Use replaceState to clear the URL without triggering a page reload
+          const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({ path: newUrl }, '', newUrl);
         }
       } catch (error) {
         console.error("Error checking connections:", error);
