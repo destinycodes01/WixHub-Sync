@@ -41,6 +41,14 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
             alert(`HubSpot Connection Failed:\n\n${details ? decodeURIComponent(details) : 'Unknown error'}`);
           }
         }
+        
+        if (urlParams.has('wix_connected')) {
+          const status = urlParams.get('wix_connected');
+          const details = urlParams.get('details');
+          if (status === 'error') {
+            alert(`Wix Connection Failed:\n\n${details ? decodeURIComponent(details) : 'Unknown error'}`);
+          }
+        }
 
         if (urlParams.has('hubspot_connected') || urlParams.has('wix_connected')) {
           // Use replaceState to clear the URL without triggering a page reload

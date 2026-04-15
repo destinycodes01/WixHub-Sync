@@ -21,17 +21,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { access_token, refresh_token } = response.data;
 
-    const db = getDb();
-    await db.collection('wix_connections').doc(userId as string).set({
-      userId,
-      access_token,
-      refresh_token,
-      createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-    });
+    try {
+      const db = getDb();
+      await db.collection('wix_connections').doc(userId as string).set({
+        userId,
+        access_token,
+        refresh_token,
+        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (err: any) {
+      console.error("FIREBASE ERROR:", err);
+    }
 
-    res.redirect('/?wix_connected=success');
+    return res.redirect('https://wixhubsync.vercel.app/?wix_connected=success');
   } catch (error: any) {
     console.error('Wix OAuth Error:', error.response?.data || error.message);
-    res.redirect('/?wix_connected=error');
+    const encodedError = encodeURIComponent(error.response?.data?.message || error.message);
+    return res.redirect(`https://wixhubsync.vercel.app/?wix_connected=error&details=${encodedError}`);
   }
 }
