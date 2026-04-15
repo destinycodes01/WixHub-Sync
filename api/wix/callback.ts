@@ -3,22 +3,22 @@ import axios from 'axios';
 import { getDb, firebaseAdmin } from '../_lib/firebase.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log("WIX CALLBACK HIT");
   const { code, state: userId } = req.query;
   if (!code || !userId) return res.status(400).send('Missing code or state');
 
   const WIX_CLIENT_ID = process.env.WIX_CLIENT_ID;
-  const WIX_CLIENT_SECRET = process.env.WIX_CLIENT_SECRET;
-  const WIX_REDIRECT_URI = process.env.WIX_REDIRECT_URI || 'http://localhost:3000/wix/oauth-callback';
+  const WIX_REDIRECT_URI = 'https://wixhubsync.vercel.app/api/wix/callback';
 
   try {
-    const response = await axios.post('https://www.wix.com/oauth/access', {
+    const response = await axios.post('https://www.wixapis.com/oauth2/token', {
       grant_type: 'authorization_code',
       client_id: WIX_CLIENT_ID,
-      client_secret: WIX_CLIENT_SECRET,
       code,
       redirect_uri: WIX_REDIRECT_URI,
     });
 
+    console.log("WIX TOKEN SUCCESS");
     const { access_token, refresh_token } = response.data;
 
     try {
