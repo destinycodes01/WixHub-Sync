@@ -8,8 +8,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     const userId = req.query.userId as string | undefined;
     const stateParam = userId ? `&state=${userId}` : '';
 
-    // Wix Headless uses the standard OAuth2 authorization endpoint
-    const authUrl = `https://www.wix.com/oauth/authorize?client_id=${WIX_CLIENT_ID}&redirect_uri=${encodeURIComponent(WIX_REDIRECT_URI)}&response_type=code${stateParam}`;
+    // Wix Developer Center apps must use the installer/install endpoint
+    const authUrl = `https://www.wix.com/installer/install?appId=${WIX_CLIENT_ID}&redirectUrl=${encodeURIComponent(WIX_REDIRECT_URI)}${stateParam}`;
     res.redirect(authUrl);
   } catch (error) {
     console.error("Wix OAuth Error:", error);
