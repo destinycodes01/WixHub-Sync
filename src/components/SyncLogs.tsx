@@ -57,15 +57,15 @@ export default function SyncLogs({ user }: SyncLogsProps) {
   }, [user.uid]);
 
   return (
-    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
-      <div className="p-6 border-b border-neutral-border flex items-center justify-between">
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden w-full">
+      <div className="p-4 md:p-6 border-b border-neutral-border flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-neutral-text">Sync Logs</h2>
           <p className="text-sm text-neutral-subtext mt-1">Recent activity and synchronization events.</p>
         </div>
         <button
           onClick={fetchLogs}
-          className="p-2 text-neutral-subtext hover:text-brand-blue-main transition-colors rounded-lg hover:bg-brand-blue-main/10"
+          className="p-2 text-neutral-subtext hover:text-brand-blue-main transition-colors rounded-lg hover:bg-brand-blue-main/10 shrink-0"
           title="Refresh logs"
         >
           <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />

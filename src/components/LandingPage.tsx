@@ -121,7 +121,7 @@ export default function LandingPage({ onLogin, isLoggingIn, loginError, loginSuc
             <span className="flex h-2 w-2 rounded-full bg-brand-blue-main"></span>
             Wix & HubSpot Integration
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-text mb-6 max-w-5xl mx-auto leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-text mb-6 max-w-5xl mx-auto leading-[1.1]">
             Sync your Wix contacts with <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-main to-brand-blue-light">HubSpot</span> seamlessly
           </h1>
           <p className="text-lg md:text-xl text-neutral-subtext mb-10 max-w-2xl mx-auto leading-relaxed">

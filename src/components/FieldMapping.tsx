@@ -89,8 +89,8 @@ export default function FieldMapping({ user }: FieldMappingProps) {
   }
 
   return (
-    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden">
-      <div className="p-6 border-b border-neutral-border flex items-center justify-between">
+    <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden w-full">
+      <div className="p-4 md:p-6 border-b border-neutral-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-neutral-text">Field Mapping</h2>
           <p className="text-sm text-neutral-subtext mt-1">Configure how data flows between Wix and HubSpot.</p>
@@ -98,14 +98,14 @@ export default function FieldMapping({ user }: FieldMappingProps) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-orange-main rounded-lg hover:bg-brand-orange-dark transition-colors disabled:opacity-50 shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-orange-main rounded-lg hover:bg-brand-orange-dark transition-colors disabled:opacity-50 shadow-sm"
         >
           <Save className="w-4 h-4" />
           {saving ? 'Saving...' : 'Save Mappings'}
         </button>
       </div>
       
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="overflow-x-auto rounded-lg border border-neutral-border">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50">
