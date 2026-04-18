@@ -3,7 +3,6 @@ import { User } from 'firebase/auth';
 import { db } from '../firebase';
 import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { CheckCircle2, AlertCircle, Link as LinkIcon, Unlink } from 'lucide-react';
-import WixDataTest from './WixDataTest';
 
 interface ConnectionPanelProps {
   user: User;
@@ -204,9 +203,6 @@ export default function ConnectionPanel({ user }: ConnectionPanelProps) {
           )}
         </div>
       </div>
-      
-      {/* Test Section */}
-      <WixDataTest />
     </div>
   );
 }
