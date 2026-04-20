@@ -56,20 +56,57 @@ export default function SyncLogs({ user }: SyncLogsProps) {
     fetchLogs();
   }, [user.uid]);
 
+  const runTestSync = async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const res = await fetch('/api/sync/wix-to-hubspot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          contact: {
+            id: 'test_id_' + Date.now().toString(),
+            firstName: 'Test',
+            lastName: 'User',
+            email: `test${Date.now()}@example.com`,
+            phone: '555-123-4567'
+          }
+        })
+      });
+      const data = await res.json();
+      console.log('Test sync result:', data);
+      await fetchLogs(); // Immediately refresh the logs
+    } catch (err) {
+      console.error('Test sync failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-neutral-card rounded-xl shadow-sm border border-neutral-border overflow-hidden w-full">
-      <div className="p-4 md:p-6 border-b border-neutral-border flex items-center justify-between">
+      <div className="p-4 md:p-6 border-b border-neutral-border flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-lg font-semibold text-neutral-text">Sync Logs</h2>
           <p className="text-sm text-neutral-subtext mt-1">Recent activity and synchronization events.</p>
         </div>
-        <button
-          onClick={fetchLogs}
-          className="p-2 text-neutral-subtext hover:text-brand-blue-main transition-colors rounded-lg hover:bg-brand-blue-main/10 shrink-0"
-          title="Refresh logs"
-        >
-          <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={runTestSync}
+            disabled={loading}
+            className="px-3 py-1.5 text-xs font-medium text-brand-blue-main bg-brand-blue-light/10 hover:bg-brand-blue-light/20 rounded-lg transition-colors border border-brand-blue-light/20 shadow-sm disabled:opacity-50"
+          >
+            Run Test Sync
+          </button>
+          <button
+            onClick={fetchLogs}
+            className="p-2 text-neutral-subtext hover:text-brand-blue-main transition-colors rounded-lg hover:bg-brand-blue-main/10 shrink-0"
+            title="Refresh logs"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
       
       <div className="divide-y divide-neutral-border max-h-[600px] overflow-y-auto">
