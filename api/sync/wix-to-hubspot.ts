@@ -121,10 +121,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(200).json({ success: true, message: 'Contact synced to HubSpot' });
   } catch (error: any) {
     console.error('Sync Error (Wix -> HubSpot):', error.response?.data || error.message);
-    await logSync(userId, 'wix', 'error', `Failed to sync: ${error.message}`, contactId);
+    const errorMessage = error.response?.data?.message || error.message;
+    await logSync(userId, 'wix', 'error', `Failed to sync: ${errorMessage}`, contactId);
     
     // Return 200 so Wix Automations doesn't repeatedly retry failing webhooks unless it's a critical server issue
     // Alternatively return 500 if you want Wix to retry. We'll return 500 for actual unhandled throws.
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: errorMessage });
   }
 }
