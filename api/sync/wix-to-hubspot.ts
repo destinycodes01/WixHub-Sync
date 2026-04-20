@@ -89,20 +89,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 7. Send to HubSpot
     let hubspotContactId;
+    let finalAccessToken = access_token;
+    
     try {
       const response = await axios.post('https://api.hubapi.com/crm/v3/objects/contacts', hsContact, {
-        headers: { Authorization: `Bearer ${access_token}` }
+        headers: { Authorization: `Bearer ${finalAccessToken}` }
       });
       hubspotContactId = response.data.id;
       console.log(`[HubSpot Sync] Successfully created contact ${hubspotContactId}`);
       await logSync(userId, 'wix', 'success', `Synced contact ${normalizedContact.email} to HubSpot`, contactId, hubspotContactId);
       
     } catch (hubspotError: any) {
-      if (hubspotError.response?.status === 409) {
+      // Handle the 401 Unauthorized token expiration
+      if (hubspotError.response?.status === 401 && hsConn.data()!.refresh_token) {
+        console.log(`[HubSpot Sync] Token expired for user ${userId}. Attempting refresh...`);
+        
+        try {
+          const formData = new URLSearchParams();
+          formData.append('grant_type', 'refresh_token');
+          formData.append('client_id', process.env.HUBSPOT_CLIENT_ID || '');
+          formData.append('client_secret', process.env.HUBSPOT_CLIENT_SECRET || '');
+          formData.append('refresh_token', hsConn.data()!.refresh_token);
+
+          const refreshRes = await axios.post('https://api.hubapi.com/oauth/v3/token', formData.toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          });
+
+          finalAccessToken = refreshRes.data.access_token;
+          const new_refresh_token = refreshRes.data.refresh_token;
+
+          // Update DB with fresh tokens
+          await db.collection('hubspot_connections').doc(userId).update({
+            access_token: finalAccessToken,
+            refresh_token: new_refresh_token,
+            updatedAt: new Date().toISOString() // Using simple Date string here inside Firebase Admin
+          });
+
+          console.log(`[HubSpot Sync] Token refreshed successfully. Retrying request...`);
+
+          // Retry the HubSpot request
+          const retryResponse = await axios.post('https://api.hubapi.com/crm/v3/objects/contacts', hsContact, {
+            headers: { Authorization: `Bearer ${finalAccessToken}` }
+          });
+          
+          hubspotContactId = retryResponse.data.id;
+          console.log(`[HubSpot Sync] Successfully created contact ${hubspotContactId} after refresh`);
+          await logSync(userId, 'wix', 'success', `Synced contact ${normalizedContact.email} to HubSpot (after token refresh)`, contactId, hubspotContactId);
+        } catch (refreshError: any) {
+          console.error(`[HubSpot Sync] Token refresh completely failed:`, refreshError.response?.data || refreshError.message);
+          throw new Error('HubSpot credentials expired and automatic refresh failed. Please reconnect HubSpot.');
+        }
+
+      } else if (hubspotError.response?.status === 409) {
         // Handle Duplicate Contact
         console.log(`[HubSpot Sync] Duplicate contact ignored: ${normalizedContact.email}`);
         await logSync(userId, 'wix', 'success', `Duplicate contact ${normalizedContact.email} ignored/needs update`, contactId);
-        // We return success: true because it's an expected operational result, avoiding Wix retries
         return res.status(200).json({ success: true, message: 'Duplicate ignored' });
       } else {
         throw hubspotError; // Re-throw other errors to be caught by the outer catch
