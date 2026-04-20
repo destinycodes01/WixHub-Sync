@@ -37,9 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.json({ success: true, message: 'Skipped to prevent loop' });
     }
 
-    // 3. Send to Wix (Mocking the Wix API call structure as per standard Wix CRM API)
-    // In a fully real scenario, we'd use the exact Wix CRM endpoint
-    /*
+    // 3. Send to Wix
     const response = await axios.post('https://www.wixapis.com/contacts/v4/contacts', {
       info: {
         name: { first: contact.firstname, last: contact.lastname },
@@ -47,11 +45,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         phones: [{ phone: contact.phone }]
       }
     }, {
-      headers: { Authorization: `Bearer ${access_token}` }
+      headers: { 
+        'Authorization': access_token, // It's a Wix Headless token
+        'Content-Type': 'application/json'
+      }
     });
+    
     const wixContactId = response.data.contact.id;
-    */
-    const wixContactId = 'wix_mock_id_' + Date.now(); // Placeholder for actual Wix API call
 
     // 4. Save Mapping
     await mappingRef.set({
