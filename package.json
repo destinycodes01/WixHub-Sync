@@ -18,6 +18,8 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
+    "@wix/members": "^1.0.438",
+    "@wix/sdk": "^1.21.6",
     "axios": "^1.14.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
