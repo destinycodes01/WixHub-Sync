@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getDb } from '../firebase.js';
+import { getContactMapping, upsertContactMapping } from './contactMapping.js';
 
 export interface NormalizedContact {
   id: string; // HubSpot Contact ID
@@ -25,7 +26,6 @@ async function logSync(userId: string, source: 'wix' | 'hubspot', status: 'succe
 
 /**
  * Reusable Core Service for Syncing HubSpot records to Wix.
- * This cleanly encapsulates API routing vs native business logic execution.
  */
 export async function syncHubspotToWix(userId: string, contact: NormalizedContact) {
   const db = getDb();
@@ -35,22 +35,25 @@ export async function syncHubspotToWix(userId: string, contact: NormalizedContac
   if (!wixConn.exists) throw new Error('Wix not connected for this user');
   const { access_token } = wixConn.data()!;
 
-  // 2. Exact Match ID Tracking (Anti-Looping)
-  const syncId = `hs_${contact.id}`;
-  const mappingRef = db.collection('contact_mappings').doc(syncId);
-  const mapping = await mappingRef.get();
+  // 2. Fetch Mapping logically
+  const mapping = await getContactMapping(userId, contact.email);
   
-  if (mapping.exists && Date.now() - mapping.data()!.lastSyncedAt < 60000) {
+  if (mapping && Date.now() - mapping.lastHubSpotUpdate < 60000) {
     console.log(`[Service] Loop prevention active: Skipped HubSpot contact ${contact.id}`);
     return { success: true, message: 'Skipped to prevent loop' };
   }
 
   // 3. Dispatch to Wix Contacts v4 API
-  const response = await axios.post('https://www.wixapis.com/contacts/v4/contacts', {
-    info: {
+  let wixContactId = mapping?.wixContactId;
+
+  // We use the upsert endpoint on Wix which uses the email standard if ID is omitted
+  // But if we know the wixContactId natively from our mapping, we can patch.
+  // Actually, Wix v4 upsert takes the email and merges.
+  const response = await axios.post('https://www.wixapis.com/contacts/v4/contacts/upsert', {
+    contactInfo: {
       name: { first: contact.firstname, last: contact.lastname },
       emails: [{ email: contact.email }],
-      phones: [{ phone: contact.phone }]
+      phones: contact.phone ? [{ phone: contact.phone }] : []
     }
   }, {
     headers: { 
@@ -59,18 +62,18 @@ export async function syncHubspotToWix(userId: string, contact: NormalizedContac
     }
   });
 
-  const wixContactId = response.data.contact?.id;
+  wixContactId = response.data.contact?.id;
+
   if (!wixContactId) {
+    // If upsert fails or doesn't return the ID, throw error
     throw new Error('Wix API did not resolve a valid contact ID in the response body');
   }
 
   // 4. Set state to prevent bounce loop
-  await mappingRef.set({
+  await upsertContactMapping(userId, contact.email, {
     wixContactId,
     hubspotContactId: contact.id,
-    lastSyncedAt: Date.now(),
-    source: 'hubspot',
-    syncId
+    source: 'hubspot'
   });
 
   // 5. Append clean generic audit trail (No PII)
