@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getDb } from '../firebase.js';
-import { getContactMapping, upsertContactMapping } from './contactMapping.js';
+import { getMappingByEmail, getMappingByHubspotId, upsertContactMapping } from './contactMapping.js';
 
 export interface NormalizedContact {
   id: string; // HubSpot Contact ID
@@ -11,17 +11,34 @@ export interface NormalizedContact {
 }
 
 async function logSync(userId: string, source: 'wix' | 'hubspot', status: 'success' | 'error', message: string, wixContactId?: string, hubspotContactId?: string) {
-  const db = getDb();
-  await db.collection('sync_logs').add({
-    userId,
-    timestamp: new Date().toISOString(),
-    operationType: 'sync',
-    source,
-    status,
-    message,
-    wixContactId: wixContactId || null,
-    hubspotContactId: hubspotContactId || null,
-  });
+  try {
+    const db = getDb();
+    await db.collection('sync_logs').add({
+      userId,
+      timestamp: new Date().toISOString(),
+      operationType: 'sync',
+      source,
+      status,
+      message,
+      wixContactId: wixContactId || null,
+      hubspotContactId: hubspotContactId || null,
+    });
+  } catch (err) {
+    console.error('Failed to write to sync_logs', err);
+  }
+}
+
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delayMs = 300): Promise<T> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const shouldRetry = !status || status >= 500 || status === 429;
+    
+    if (retries <= 1 || !shouldRetry) throw error;
+    await new Promise(res => setTimeout(res, delayMs));
+    return withRetry(fn, retries - 1, delayMs);
+  }
 }
 
 /**
@@ -35,49 +52,62 @@ export async function syncHubspotToWix(userId: string, contact: NormalizedContac
   if (!wixConn.exists) throw new Error('Wix not connected for this user');
   const { access_token } = wixConn.data()!;
 
-  // 2. Fetch Mapping logically
-  const mapping = await getContactMapping(userId, contact.email);
+  // 2. Fetch Mapping logically via HS ID fallback to matching Email
+  let mapping = await getMappingByHubspotId(userId, contact.id);
+  if (!mapping && contact.email) {
+    mapping = await getMappingByEmail(userId, contact.email);
+  }
+
+  const resolvedEmail = contact.email || (mapping ? mapping.data.email : '');
+
+  // Edge case: No Email on incoming payload and no mapping found -> skip sync completely
+  if (!resolvedEmail) {
+    return { success: true, message: 'Skipped - no email and no mapping found' };
+  }
   
-  if (mapping && Date.now() - mapping.lastHubSpotUpdate < 60000) {
+  if (mapping && mapping.data.lastSource === 'hubspot' && Date.now() - mapping.data.lastUpdatedAt < 5000) {
     console.log(`[Service] Loop prevention active: Skipped HubSpot contact ${contact.id}`);
     return { success: true, message: 'Skipped to prevent loop' };
   }
 
   // 3. Dispatch to Wix Contacts v4 API
-  let wixContactId = mapping?.wixContactId;
+  let wixContactId = mapping?.data.wixContactId;
 
-  // We use the upsert endpoint on Wix which uses the email standard if ID is omitted
-  // But if we know the wixContactId natively from our mapping, we can patch.
-  // Actually, Wix v4 upsert takes the email and merges.
-  const response = await axios.post('https://www.wixapis.com/contacts/v4/contacts/upsert', {
-    contactInfo: {
-      name: { first: contact.firstname, last: contact.lastname },
-      emails: [{ email: contact.email }],
-      phones: contact.phone ? [{ phone: contact.phone }] : []
-    }
-  }, {
-    headers: { 
-      'Authorization': access_token,
-      'Content-Type': 'application/json'
-    }
-  });
+  // We use the upsert endpoint on Wix which merges on email matching
+  const executeWixSync = async () => {
+    return withRetry(async () => {
+      const response = await axios.post('https://www.wixapis.com/contacts/v4/contacts/upsert', {
+        contactInfo: {
+          name: { first: contact.firstname, last: contact.lastname },
+          emails: [{ email: resolvedEmail }],
+          phones: contact.phone ? [{ phone: contact.phone }] : []
+        }
+      }, {
+        headers: { 
+          'Authorization': access_token,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data.contact?.id;
+    });
+  };
 
-  wixContactId = response.data.contact?.id;
+  wixContactId = await executeWixSync();
 
   if (!wixContactId) {
-    // If upsert fails or doesn't return the ID, throw error
     throw new Error('Wix API did not resolve a valid contact ID in the response body');
   }
 
   // 4. Set state to prevent bounce loop
-  await upsertContactMapping(userId, contact.email, {
+  await upsertContactMapping(userId, {
+    email: resolvedEmail,
     wixContactId,
     hubspotContactId: contact.id,
     source: 'hubspot'
   });
 
   // 5. Append clean generic audit trail (No PII)
-  await logSync(userId, 'hubspot', 'success', 'Successfully synchronized contact from HubSpot to Wix', wixContactId, contact.id);
+  await logSync(userId, 'hubspot', 'success', `Successfully synchronized contact ${resolvedEmail} from HubSpot to Wix`, wixContactId, contact.id);
   
   return { success: true, message: 'Contact synced to Wix securely' };
 }

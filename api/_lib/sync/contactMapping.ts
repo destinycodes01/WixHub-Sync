@@ -1,55 +1,83 @@
-import crypto from 'crypto';
-import { getDb, firebaseAdmin } from '../firebase.js';
+import { getDb } from '../firebase.js';
 
 export interface ContactMapping {
   userId: string;
   email: string;
   wixContactId: string | null;
   hubspotContactId: string | null;
-  lastWixUpdate: number;
-  lastHubSpotUpdate: number;
+  lastSource: 'wix' | 'hubspot';
+  lastUpdatedAt: number;
 }
 
-export function getMappingId(userId: string, email: string) {
-  const normalizedEmail = email.toLowerCase().trim();
-  return crypto.createHash('md5').update(`${userId}_${normalizedEmail}`).digest('hex');
-}
-
-export async function getContactMapping(userId: string, email: string): Promise<ContactMapping | null> {
+export async function getMappingByEmail(userId: string, email: string): Promise<{ id: string, data: ContactMapping } | null> {
   if (!email) return null;
   const db = getDb();
-  const mappingRef = db.collection('contact_mappings').doc(getMappingId(userId, email));
-  const snap = await mappingRef.get();
-  if (!snap.exists) return null;
-  return snap.data() as ContactMapping;
+  const snap = await db.collection('contact_mappings')
+    .where('userId', '==', userId)
+    .where('email', '==', email.toLowerCase().trim())
+    .limit(1)
+    .get();
+  
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, data: snap.docs[0].data() as ContactMapping };
 }
 
-export async function upsertContactMapping(userId: string, email: string, updates: { 
-  wixContactId?: string; 
+export async function getMappingByWixId(userId: string, wixContactId: string): Promise<{ id: string, data: ContactMapping } | null> {
+  if (!wixContactId) return null;
+  const db = getDb();
+  const snap = await db.collection('contact_mappings')
+    .where('userId', '==', userId)
+    .where('wixContactId', '==', wixContactId)
+    .limit(1)
+    .get();
+
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, data: snap.docs[0].data() as ContactMapping };
+}
+
+export async function getMappingByHubspotId(userId: string, hubspotContactId: string): Promise<{ id: string, data: ContactMapping } | null> {
+  if (!hubspotContactId) return null;
+  const db = getDb();
+  const snap = await db.collection('contact_mappings')
+    .where('userId', '==', userId)
+    .where('hubspotContactId', '==', hubspotContactId)
+    .limit(1)
+    .get();
+
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, data: snap.docs[0].data() as ContactMapping };
+}
+
+export async function upsertContactMapping(userId: string, details: {
+  email?: string;
+  wixContactId?: string;
   hubspotContactId?: string;
   source: 'wix' | 'hubspot';
 }) {
   const db = getDb();
-  const mappingId = getMappingId(userId, email);
-  const mappingRef = db.collection('contact_mappings').doc(mappingId);
+  let existingDocId: string | null = null;
+  let m = null;
 
-  const now = Date.now();
-  const updatePayload: any = {
+  // Attempt resolution cascades matching existing documents
+  if (details.wixContactId) m = await getMappingByWixId(userId, details.wixContactId);
+  if (!m && details.hubspotContactId) m = await getMappingByHubspotId(userId, details.hubspotContactId);
+  if (!m && details.email) m = await getMappingByEmail(userId, details.email);
+
+  if (m) existingDocId = m.id;
+
+  const mappingRef = existingDocId 
+    ? db.collection('contact_mappings').doc(existingDocId) 
+    : db.collection('contact_mappings').doc(); // Auto-ID if none exists
+
+  const updatePayload: Partial<ContactMapping> = {
     userId,
-    email: email.toLowerCase().trim()
+    lastSource: details.source,
+    lastUpdatedAt: Date.now()
   };
 
-  if (updates.wixContactId) updatePayload.wixContactId = updates.wixContactId;
-  if (updates.hubspotContactId) updatePayload.hubspotContactId = updates.hubspotContactId;
-  
-  if (updates.source === 'wix') {
-    updatePayload.lastWixUpdate = now;
-    // Set to 0 if doesn't exist so we have a number
-    updatePayload.lastHubSpotUpdate = firebaseAdmin.firestore.FieldValue.increment(0) as any;
-  } else {
-    updatePayload.lastHubSpotUpdate = now;
-    updatePayload.lastWixUpdate = firebaseAdmin.firestore.FieldValue.increment(0) as any;
-  }
+  if (details.email) updatePayload.email = details.email.toLowerCase().trim();
+  if (details.wixContactId) updatePayload.wixContactId = details.wixContactId;
+  if (details.hubspotContactId) updatePayload.hubspotContactId = details.hubspotContactId;
 
   await mappingRef.set(updatePayload, { merge: true });
 }

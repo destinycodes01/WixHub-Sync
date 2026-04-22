@@ -1,40 +1,64 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { wixClient } from '../_lib/wixClient.js';
+import axios from 'axios';
+import { getDb } from '../_lib/firebase.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
+  const userId = req.query.userId as string;
+  if (!userId) {
+    return res.status(400).json({ error: 'Missing userId in query string' });
+  }
+
   try {
-    // We default to an empty site ID for listing all members associated with the API Key/Project
-    // Note: depending on the exact member API implementation, you might need to use queryMembers() if listMembers() isn't standard in V1
-    const response = await wixClient.members.queryMembers().find();
+    const db = getDb();
+    const wixConn = await db.collection('wix_connections').doc(userId).get();
     
-    const count = response.totalCount || response.items.length;
-    const rawMembers = response.items || [];
+    if (!wixConn.exists) {
+      return res.status(404).json({ success: false, error: 'Wix unauthenticated. Please connect Wix first.' });
+    }
+    
+    const { access_token } = wixConn.data()!;
+
+    // Request members natively through Wix headless REST API using the user's authorized token
+    const response = await axios.get('https://www.wixapis.com/members/v1/members', {
+      headers: { 
+        'Authorization': access_token,
+        'Accept': 'application/json'
+      }
+    });
+    
+    const membersData = response.data;
+    const rawMembers = membersData.members || membersData.items || [];
+    const count = membersData.metadata?.total || rawMembers.length;
 
     const cleanedMembers = rawMembers.map((member: any) => ({
       email: member.loginEmail || member.profile?.email || "",
       name: member.profile?.nickname || member.profile?.slug || "",
-      wixMemberId: member._id
+      wixMemberId: member.id || member._id
     }));
-
-    console.log(`Total members fetched: ${cleanedMembers.length}`);
-    if (cleanedMembers.length > 0) {
-      console.log('Sample member (first item):', cleanedMembers[0]);
-    }
 
     return res.status(200).json({
       success: true,
-      count: cleanedMembers.length,
+      count,
       members: cleanedMembers
     });
   } catch (error: any) {
-    console.error("Error fetching Wix members:", error);
+    console.error("Error fetching Wix members:", error.response?.data || error.message);
+    
+    // Check if unauthorized cleanly
+    if (error.response?.status === 401) {
+      return res.status(401).json({
+        success: false,
+        error: 'Wix access token expired. Refreshing tokens via Headless requires re-authentication or silent offline_access refresh handling.'
+      });
+    }
+
     return res.status(500).json({
       success: false,
-      error: error.message || 'Failed to fetch members'
+      error: error.response?.data?.message || error.message || 'Failed to fetch members'
     });
   }
 }
