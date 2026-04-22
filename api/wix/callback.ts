@@ -36,14 +36,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log("WIX TOKEN SUCCESS");
     const { access_token, refresh_token } = response.data;
 
+    let wixInstanceId = null;
+    let wixSiteId = null;
+
     try {
-      // Save tokens permanently
-      await db.collection('wix_connections').doc(userId as string).set({
+      // Decode JWT access_token safely to extract multi-tenant identifiers
+      const parts = access_token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+        wixInstanceId = payload.appInstanceId || payload.instanceId || null;
+        wixSiteId = payload.tenantId || payload.siteId || null;
+      }
+    } catch(e) {
+      console.warn("Could not decode identity from Wix access token.");
+    }
+
+    try {
+      // Save tokens permanently alongside multi-tenant identifiers
+      const connectionData: any = {
         userId,
         access_token,
         refresh_token,
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-      });
+      };
+
+      if (wixInstanceId) connectionData.wixInstanceId = wixInstanceId;
+      if (wixSiteId) connectionData.wixSiteId = wixSiteId;
+
+      await db.collection('wix_connections').doc(userId as string).set(connectionData, { merge: true });
       
       // Cleanup the temporary state doc
       await db.collection('wix_oauth_states').doc(state as string).delete();
